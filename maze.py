@@ -3,6 +3,7 @@ A simple maze generator using Prim's algorithm.
 """
 
 import random
+import sys
 
 heap = [None]
 
@@ -50,6 +51,15 @@ def extract():
 # m x n maze with m and n greater than 2
 m = 10
 n = 10
+
+if len(sys.argv) >= 2 and sys.argv[1].isdigit():
+    m = max(3, int(sys.argv[1]))
+
+if len(sys.argv) >= 3 and sys.argv[2].isdigit():
+    n = max(3, int(sys.argv[2]))
+else:
+    n = m
+
 size = m * n
 
 maze = [[random.randint(1, 100) for i in range(2*n-1)] for j in range(2*m-1)]
