@@ -6,11 +6,11 @@ typedef int num;
  * Median of a dynamic array.
  * Add element - O(log n)
  * Remove element - O(log n)
- * Query median - amortized O(1)
+ * Query median - O(1)
  */
 
-num n, k, a;
-vector<num> as;
+num a;
+string s;
 
 typedef struct {
     priority_queue<num> lo, hi;
@@ -73,27 +73,20 @@ typedef struct {
 } med;
 
 int main() {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
-
-    cin >> n >> k;
-    for (int i = 0; i < n; ++i) {
-        cin >> a;
-        as.emplace_back(a);
-    }
-
     med m;
-    for (int i = 0; i < k; ++i) {
-        m.add(as[i]);
+    cin >> s;
+    while (s != "x") {
+        switch (s[0]) {
+            case '+':
+                m.add(stoi(s.substr(1)));
+                break;
+            case '-':
+                m.remove(stoi(s.substr(1)));
+                break;
+            case 'q':
+                cout << m.query() << endl;
+                break;
+        }
+        cin >> s;
     }
-    
-    num mx = m.query();
-
-    for (int i = k; i < n; ++i) {
-        m.remove(as[i-k]);
-        m.add(as[i]);
-        mx = max(mx, m.query());
-    }
-
-    cout << mx;
 }
