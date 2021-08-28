@@ -36,15 +36,14 @@ def solve(graph, locations):
         for v in graph[u]:
             paths[u][v] = (graph[u][v], [u, v] if u != v else [u])
 
-    for i in locations:
-        for j in locations:
-            if i != j:
-                for k in locations:
-                    if paths[i][k][0] + paths[k][j][0] < paths[i][j][0]:
-                        paths[i][j] = (
-                            paths[i][k][0] + paths[k][j][0],
-                            paths[i][k][1] + paths[k][j][1][1:]
-                        )
+    for k in locations:
+        for i in locations:
+            for j in locations:
+                if paths[i][k][0] + paths[k][j][0] < paths[i][j][0]:
+                    paths[i][j] = (
+                        paths[i][k][0] + paths[k][j][0],
+                        paths[i][k][1] + paths[k][j][1][1:]
+                    )
     
     return paths
 
