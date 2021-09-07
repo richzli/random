@@ -16,7 +16,7 @@
     --text-a: var(--blue-light);
     --text-a-hover: var(--blue-strong);
     --text-mark: var(--purple-dark);
-    --pre-code: #283136;
+    --pre-code: rgba(40, 49, 54, 0.7);
     --text-highlight-bg: var(--purple-dark);
     /* --interactive-accent: #ff7171; */
     --interactive-accent: var(--purple-dark);
