@@ -1,0 +1,136 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{palatino}
+
+% a bunch of useful packages %
+
+\usepackage{graphicx}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{color}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{xfrac}
+\usepackage{mathrsfs}
+\usepackage{stmaryrd}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,backgrounds}
+
+% formatting things %
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+
+\usepackage{etoolbox}
+\AtBeginEnvironment{align}{\setcounter{equation}{0}}
+
+\newcommand{\homework}[1]{{\huge Homework #1\hfill Richard Li}\input{#1.tex}}
+\newcommand{\exam}[1]{{\huge Exam #1\hfill Richard Li}\input{exam#1.tex}}
+
+\newcommand{\pt}[1]{\subsection*{#1}\vspace{-0.4cm}\hrulefill}
+\newcommand{\image}[3]{
+    \begin{figure}[h!]
+    \centering
+    \includegraphics[scale=#3]{#1}
+    \caption{#2}
+    \end{figure}
+}
+
+\renewcommand{\theenumi}{\alph{enumi}.}
+\setlist[enumerate]{nosep,topsep=0pt,label=(\arabic*)}
+\setlist[itemize]{nosep,topsep=0pt}
+
+\newcommand{\DEF}{{\color{blue}\texttt{DEF} }}
+\newcommand{\THM}{{\color{violet}\texttt{THM} }}
+\newcommand{\EX}{{\color{red}\texttt{EX.} }}
+
+% general symbols and operators %
+
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\newcommand{\impl}{\Rightarrow}
+\renewcommand{\iff}{\Leftrightarrow}
+\renewcommand{\qed}{{\tiny $\blacksquare$}}
+
+\newcommand{\negg}{\neg\,}
+\newcommand{\xor}{\oplus}
+
+\newcommand{\qequiv}{\stackrel{?}{\equiv}}
+
+\newcommand{\btext}[1]{$\boxed{\text{#1}}$}
+
+% number theory %
+
+\newcommand{\divides}{{\big\vert}}
+\newcommand{\notdivides}{\nmid}
+\newcommand{\abs}[1]{\left\vert#1\right\vert}
+
+\newcommand{\lcm}{\mathrm{lcm}}
+\newcommand{\sgn}{\mathrm{sgn}}
+
+% sets %
+
+\newcommand{\setmem}[1]{\left\{#1\right\}}
+\DeclarePairedDelimiterX\set[2]{\{}{\}}{#1 \delimsize\vert #2}
+\newcommand{\notset}[1]{\overline{#1}}
+
+\renewcommand{\emptyset}{\varnothing}
+\newcommand{\nullset}{\emptyset}
+
+\newcommand{\union}{\cup}
+\newcommand{\intersect}{\cap}
+
+% analysis %
+
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\let\sect\S
+\renewcommand{\S}{\mathbb{S}}
+
+\newcommand{\dee}{\partial}
+\newcommand{\eps}{\varepsilon}
+
+% algebra %
+
+\newcommand{\subgroup}{\leqslant}
+\newcommand{\cyclic}[1]{\left\langle#1\right\rangle}
+\newcommand{\normal}{\mathrel{\!\triangleleft}}
+
+% cs %
+
+\newcommand{\OPT}{\mathsf{OPT}}
+
+% code %
+
+\usepackage{listings}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\definecolor{lightpurp}{RGB}{148,131,192}
+\definecolor{darkpurp}{RGB}{76,61,117}
+\definecolor{blu}{RGB}{45,107,179}
+\definecolor{pinky}{RGB}{204,150,178}
+\definecolor{darkred}{RGB}{102,51,63}
+\lstdefinestyle{code}{
+    backgroundcolor=\color{bg},
+    basicstyle=\ttfamily\small\color{darkpurp},
+    keywordstyle=\bfseries\color{blu},
+    commentstyle=\itshape\color{pinky},
+    %identifierstyle=\color{darkred},
+    stringstyle=\color{lightpurp},
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+}
+\lstset{style=code}
+
+% document %
+
+\begin{document}
+
+{\Large{CLASS NAME}\hfill \today}
+
+\homework {1}
+
+\end{document}
