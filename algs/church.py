@@ -79,8 +79,8 @@ def bool_tests():
     print("true' -> 'foo', false' -> 'bar'")
     print("or false' false':", ORB(FALSE)(FALSE)("foo")("bar"))
     print("eq true' true':", EQB(TRUE)(TRUE)("foo")("bar"))
-# Yep, it works.
 # bool_tests()
+# Yep, it works.
 
 """
 NATURAL NUMBERS
@@ -121,7 +121,7 @@ Fixpoint eq (m n : nat) : bool :=
 match m, n with
 | O, O       => true
 | S m', S n' => eq m' n'
-| _, _       => false
+| _, _       => false.
 """
 
 # If we think about how numbers are defined, n is just z with s applied n times.
@@ -142,9 +142,10 @@ match m, n with
 # - We define a box-function-applier: when a function is passed in, we apply
 #     it to the value inside the box. We do this by using the original box to
 #     apply the function, then enclosing it in another box.
-# - On the first SUCC application, the fake box doesn't actually apply it, and
-#     ZERO is left inside the resultant box.
-# - On subsequent evaluations, SUCC is successfully applied through the box.
+# - On the first successor application, the fake box doesn't actually apply it,
+#     and zero is left inside the resultant box.
+# - On subsequent evaluations, the successor is successfully applied through
+#     the box.
 
 # λx b. b x
 BOX     = lambda x: lambda b: b(x)
