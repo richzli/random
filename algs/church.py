@@ -137,20 +137,21 @@ match m, n with
 # So here's the plan:
 # - We have a datatype that boxes a number, which applies a function when
 #     passed to it.
-# - We transform zero to a similar box, except it ignores the function passed
-#     to it. Let's call it a wrapper, or maybe "fake box".
+# - We wrap zero in a box, except it ignores the function passed to it. Let's
+#     call it a wrapper, or maybe "fake box".
 # - We define a box-function-applier: when a function is passed in, we apply
-#     it to the value inside the box.
+#     it to the value inside the box. We do this by using the original box to
+#     apply the function, then enclosing it in another box.
 # - On the first SUCC application, the fake box doesn't actually apply it, and
-#     ZERO is left inside the box.
+#     ZERO is left inside the resultant box.
 # - On subsequent evaluations, SUCC is successfully applied through the box.
 
 # λx b. b x
-BOX     = lambda x: lambda b: b(x) # Not actually used, but for understanding.
+BOX     = lambda x: lambda b: b(x)
 # λx w. x
 WRAP    = lambda x: lambda w: x
-# λg box b. b (box g)
-BOX_APP = lambda g: lambda box: lambda b: b(box(g))
+# λg bx. BOX(bx(g))
+BOX_APP = lambda g: lambda bx: BOX(bx(g))
 
 # In the end, we end up with a box containing the actual value. So we just
 #   apply the identity function to get it out.
@@ -158,22 +159,22 @@ BOX_APP = lambda g: lambda box: lambda b: b(box(g))
 PRED    = lambda n: lambda z: lambda s: n(WRAP(z))(BOX_APP(s))(ID)
 
 # We can step through the first two applications.
-# BOX_APP(s)(WRAP(z)) = λb. b(WRAP(z)(s))
+# BOX_APP s (WRAP z)  = λb. b(WRAP z s)
 #                     = λb. b(z)
-#                     = BOX(z)
+#                     = BOX (z)
 #
-# BOX_APP(s)(BOX(z))  = λb. b(BOX(z)(s))
-#                     = λb. b(s(z))
-#                     = BOX(s(z))
+# BOX_APP s (BOX z)   = λb. b(BOX z s)
+#                     = λb. b(s z)
+#                     = BOX (s z)
 
 # Let's test it out...
 def pred_tests():
-    # Let's start off with a successor function...
+    # Let's use a "real" successor function...
     s = lambda x: x+1
 
-    print("pred(3):", PRED(THREE)(0)(s))
-    print("pred(7):", PRED(SEVEN)(0)(s))
-    print("pred(1):", PRED(ONE)(0)(s))
-    print("pred(0):", PRED(ZERO)(0)(s))
+    print("pred 3:", PRED(THREE)(0)(s))
+    print("pred 7:", PRED(SEVEN)(0)(s))
+    print("pred 1:", PRED(ONE)(0)(s))
+    print("pred 0:", PRED(ZERO)(0)(s))
 pred_tests()
 # Wow!
