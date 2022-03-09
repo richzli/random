@@ -61,7 +61,7 @@ XORB  = lambda b1: lambda b2: IF(b1)(NEGB(b2))(b2)
 EQB   = lambda b1: lambda b2: IF(b1)(b2)(NEGB(b2))
 
 # Maybe let's do some tests?
-def bool_tests_1():
+def bool_tests():
     print("true:", TRUE(True)(False))
     print("false:", FALSE(True)(False))
     print("if true then true else false:", IF(TRUE)(TRUE)(FALSE)(True)(False))
@@ -70,8 +70,24 @@ def bool_tests_1():
     print("eq true false:", EQB(TRUE)(FALSE)(True)(False))
     print("xor false true:", XORB(FALSE)(TRUE)(True)(False))
 # Yep, it works.
-# bool_tests_1()
+# bool_tests()
 
 """
 NATURAL NUMBERS
 """
+
+# Start with the inductive definitions, as usual.
+# λz s. z
+ZERO  = lambda z: lambda s: z
+# λn z s. s (n z s)
+SUCC  = lambda n: lambda z: lambda s: s(n(z)(s))
+
+# Maybe let's define some small numbers, just for funsies.
+ONE   = SUCC(ZERO)
+TWO   = SUCC(ONE)
+THREE = SUCC(TWO)
+FOUR  = SUCC(THREE)
+FIVE  = SUCC(FOUR)
+SIX   = SUCC(FIVE)
+SEVEN = SUCC(SIX)
+
