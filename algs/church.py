@@ -60,6 +60,7 @@ ANDB    = lambda b1: lambda b2: IF(b1)(b2)(FALSE)
 ORB     = lambda b1: lambda b2: IF(b1)(TRUE)(b2)
 # λb1. λb2. IF b1 (NEGB b2) b2
 XORB    = lambda b1: lambda b2: IF(b1)(NEGB(b2))(b2)
+NEQB    = XORB
 # λb1. λb2. IF b1 b2 (NEGB b2)
 EQB     = lambda b1: lambda b2: IF(b1)(b2)(NEGB(b2))
 
@@ -134,7 +135,7 @@ match m, n with
 #   pair (n-1, n) for every natural number. Predecessor would be easy in that
 #   case. But the main idea is that in the first application of successor,
 #   i.e. (0, 0) -> (0, 1), the first term somehow ignores the application.
-# So here's the plan:
+# I like this "the first application is ignored" idea. Here's the plan:
 # - We have a datatype that boxes a number, which applies a function when
 #     passed to it.
 # - We wrap zero in a box, except it ignores the function passed to it. Let's
@@ -151,8 +152,8 @@ match m, n with
 BOX     = lambda x: lambda b: b(x)
 # λx w. x
 WRAP    = lambda x: lambda w: x
-# λg bx. BOX(bx(g))
-BOX_APP = lambda g: lambda bx: BOX(bx(g))
+# λf bx. BOX (bx f)
+BOX_APP = lambda f: lambda bx: BOX(bx(f))
 
 # In the end, we end up with a box containing the actual value. So we just
 #   apply the identity function to get it out.
@@ -160,12 +161,10 @@ BOX_APP = lambda g: lambda bx: BOX(bx(g))
 PRED    = lambda n: lambda z: lambda s: n(WRAP(z))(BOX_APP(s))(ID)
 
 # We can step through the first two applications.
-# BOX_APP s (WRAP z)  = λb. b(WRAP z s)
-#                     = λb. b(z)
-#                     = BOX (z)
+# BOX_APP s (WRAP z)  = BOX (WRAP z s)
+#                     = BOX z
 #
-# BOX_APP s (BOX z)   = λb. b(BOX z s)
-#                     = λb. b(s z)
+# BOX_APP s (BOX z)   = BOX (BOX z s)
 #                     = BOX (s z)
 
 # Let's test it out...
@@ -177,5 +176,34 @@ def pred_tests():
     print("pred 7:", PRED(SEVEN)(0)(s))
     print("pred 1:", PRED(ONE)(0)(s))
     print("pred 0:", PRED(ZERO)(0)(s))
-pred_tests()
+# pred_tests()
 # Wow!
+
+# Let's try defining equality now.
+# Obviously, we can't define lambda expressions recursively, so the earlierjjknm
+#   equality definition doesn't really work.
+# But something like less-than-or-equals should be easy enough...
+# λm n. EQZ (n m PRED)
+LEQ     = lambda m: lambda n: EQZ(n(m)(PRED))
+# And equality should follow immediately.
+# λm n. ANDB (LEQN m n) (LEQN n m)
+EQN     = lambda m: lambda n: ANDB(LEQ(m)(n))(LEQ(n)(m))
+
+# Maybe some other arithmetic comparisons for fun?
+# λm n. NEGB (EQN m n)
+NEQN    = lambda m: lambda n: NEGB(EQN(m)(n))
+# λm n. LEQ n m
+GEQ     = lambda m: lambda n: LEQ(n)(m)
+# λm n. ANDB (LEQ m n) (NEQN m n)
+LT      = lambda m: lambda n: ANDB(LEQ(m)(n))(NEQN(m)(n))
+# λm n. ANDB (GEQ m n) (NEQN m n)
+GT      = lambda m: lambda n: ANDB(GEQ(m)(n))(NEQN(m)(n))
+
+def comp_tests():
+    print("leq 1 2:", LEQ(ONE)(TWO)(True)(False))
+    print("leq 2 1:", LEQ(TWO)(ONE)(True)(False))
+    print("eq 3 3:", EQN(THREE)(THREE)(True)(False))
+    print("neq 5 4:", NEQN(FIVE)(FOUR)(True)(False))
+    print("gt 3 3:", GT(THREE)(THREE)(True)(False))
+    print("lt 1 7:", LT(ONE)(SEVEN)(True)(False))
+comp_tests()
