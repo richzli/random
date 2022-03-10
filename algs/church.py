@@ -225,9 +225,37 @@ SUB     = lambda m: lambda n: n(PRED)(m)
 #   s makes this case kind of annoying, so off I go to make everything λs z.)
 # λm n s z. n (m s) z
 MUL     = lambda m: lambda n: lambda s: lambda z: n(m(s))(z)
-# Exponentiation is m reapplied to itself, n times.
+
+# Exponentiation is m reapplied on itself, n times.
 # λm n. n m
 EXP     = lambda m: lambda n: n(m)
+# Actually, the mechanics of EXP are really wonky. Note that the natural
+#   numbers N are defined under the relation (N->N)->N->N (s->z->N).
+#   But here, n seems to accept an N as the first argument! Also, when we
+#   eventually evaluate with n(m)(inc)(0), the grouping suggests that inc is
+#   actually supposed to represent a zero value! What gives?
+# Let's do a beta reduction on n(m). We see that we get λz. m(m(...m(z)...)),
+#   which seems correct, ish? m is now recursively applied on itself, so let's
+#   just consider the case where n = 2 = λs z. s(s(z)) => we have λz. m(m(z)).
+#   Higher-order cases should follow the same logic.
+# Let's reduce. We're left with
+# 
+#       λz. m(m(z))                                                   =>
+#       λz. (λs1 z1. s1(...s1(z1)...))((λs2 z2. s2(...s2(z2)...)) z)  =>
+#       λz. (λs1 z1. s1(...s1(z1)...))(λz2 z(...z(z2)...))            =>
+#       λz. (λz1. (λz2. z(...z(z2)...))(...(z1)...))                  =>
+#       λz. (λz1. z(z(...z(z(z1))...))).
+#
+# Here we can see the squaring at work: the first m uses the second m as an
+#   applicator. z2 only appears once in each (λz2. z(...z(z2)...)) term, so
+#   the z's get stacked m^2 times. Obviously, for higher exponents, this
+#   process would repeat, and we would get higher powers.
+# Also note that z has managed to work its way back into being applied in the
+#   chain during the process! This is because z ends up being used as the first
+#   argument for m, which means it gets used as the successor for m.
+# Anyways, all this feels like terrible abuse of the lambda calculus, but this
+#   is the stuff you get to do when you're not constrained by a type system,
+#   I guess.
 
 # Division is harder, so I'll leave that for later.
 
