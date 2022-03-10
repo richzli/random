@@ -88,10 +88,10 @@ NATURAL NUMBERS
 """
 
 # Start with the inductive definitions, as usual.
-# λz s. z
-ZERO    = lambda z: lambda s: z
-# λn z s. s (n z s)
-SUCC    = lambda n: lambda z: lambda s: s(n(z)(s))
+# λs z. z
+ZERO    = lambda s: lambda z: z
+# λn s z. s (n s z)
+SUCC    = lambda n: lambda s: lambda z: s(n(s)(z))
 
 # Maybe let's define some small numbers, just for funsies.
 ONE     = SUCC(ZERO)
@@ -110,8 +110,8 @@ SEVEN   = SUCC(SIX)
 # λx. FALSE
 FALSE1  = lambda x: FALSE
 # Then we can split numbers into its cases.
-# λn. n TRUE FALSE1
-EQZ     = lambda n: n(TRUE)(FALSE1)
+# λn. n FALSE1 TRUE
+EQZ     = lambda n: n(FALSE1)(TRUE)
 # λn. NEGB (EQZ n)
 NEQZ    = lambda n: NEGB(EQZ(n))
 
@@ -124,6 +124,7 @@ match m, n with
 | S m', S n' => eq m' n'
 | _, _       => false.
 """
+# Note that m' = m-1 and n' = n-1.
 
 # If we think about how numbers are defined, n is just z with s applied n times.
 # So the predecessor function should somehow generate a number that is z with
@@ -157,8 +158,8 @@ BOX_APP = lambda f: lambda bx: BOX(bx(f))
 
 # In the end, we end up with a box containing the actual value. So we just
 #   apply the identity function to get it out.
-# λn z s. n (WRAP z) (BOX_APP s) ID
-PRED    = lambda n: lambda z: lambda s: n(WRAP(z))(BOX_APP(s))(ID)
+# λn s z. n (BOX_APP s) (WRAP z) ID
+PRED    = lambda n: lambda s: lambda z: n(BOX_APP(s))(WRAP(z))(ID)
 
 # We can step through the first two applications.
 # BOX_APP s (WRAP z)  = BOX (WRAP z s)
@@ -172,19 +173,19 @@ def pred_tests():
     # Let's use a "real" successor function...
     s = lambda x: x+1
 
-    print("pred 3:", PRED(THREE)(0)(s))
-    print("pred 7:", PRED(SEVEN)(0)(s))
-    print("pred 1:", PRED(ONE)(0)(s))
-    print("pred 0:", PRED(ZERO)(0)(s))
+    print("pred 3:", PRED(THREE)(s)(0))
+    print("pred 7:", PRED(SEVEN)(s)(0))
+    print("pred 1:", PRED(ONE)(s)(0))
+    print("pred 0:", PRED(ZERO)(s)(0))
 # pred_tests()
 # Wow!
 
 # Let's try defining equality now.
-# Obviously, we can't define lambda expressions recursively, so the earlierjjknm
+# Obviously, we can't define lambda expressions recursively, so the earlier
 #   equality definition doesn't really work.
 # But something like less-than-or-equals should be easy enough...
-# λm n. EQZ (n m PRED)
-LEQ     = lambda m: lambda n: EQZ(n(m)(PRED))
+# λm n. EQZ (n PRED m)
+LEQ     = lambda m: lambda n: EQZ(n(PRED)(m))
 # And equality should follow immediately.
 # λm n. ANDB (LEQN m n) (LEQN n m)
 EQN     = lambda m: lambda n: ANDB(LEQ(m)(n))(LEQ(n)(m))
@@ -206,4 +207,37 @@ def comp_tests():
     print("neq 5 4:", NEQN(FIVE)(FOUR)(True)(False))
     print("gt 3 3:", GT(THREE)(THREE)(True)(False))
     print("lt 1 7:", LT(ONE)(SEVEN)(True)(False))
-comp_tests()
+# comp_tests()
+
+# Let's create numbers greater than seven by creating some basic
+#   arithmetic operations.
+# Remember again that the natural numbers are defined by applying a
+#   successor some number of times to a zero.
+
+# Addition is just applying s to m, n times.
+# λm n s z. n s (m s z)
+ADD     = lambda m: lambda n: lambda s: lambda z: n(s)(m(s)(z))
+# I basically already defined subtraction in LEQ, but just apply PRED n times.
+# λm n s z. n PRED m
+SUB     = lambda m: lambda n: n(PRED)(m)
+# Multiplication is just adding m to 0, n times.
+# (At this point I realize that my previous notation of putting z before
+#   s makes this case kind of annoying, so off I go to make everything λs z.)
+# λm n s z. n (m s) z
+MUL     = lambda m: lambda n: lambda s: lambda z: n(m(s))(z)
+# Exponentiation is m reapplied to itself, n times.
+# λm n. n m
+EXP     = lambda m: lambda n: n(m)
+
+# Division is harder, so I'll leave that for later.
+
+def arith_tests():
+    s = lambda x: x+1
+
+    print("add 3 4:", ADD(THREE)(FOUR)(s)(0))
+    print("add 7 (add 6 5):", ADD(SEVEN)(ADD(SIX)(FIVE))(s)(0))
+    print("sub 7 2:", SUB(SEVEN)(TWO)(s)(0))
+    print("mul 6 7:", MUL(SIX)(SEVEN)(s)(0))
+    print("exp 3 4:", EXP(THREE)(FOUR)(s)(0))
+    print("sub (exp 2 4) 3:", SUB(EXP(TWO)(FOUR))(THREE)(s)(0))
+arith_tests()
