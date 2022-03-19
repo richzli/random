@@ -154,19 +154,19 @@ BOX     = lambda x: lambda b: b(x)
 # λx w. x
 WRAP    = lambda x: lambda w: x
 # λf bx. BOX (bx f)
-BOX_APP = lambda f: lambda bx: BOX(bx(f))
+APP     = lambda f: lambda bx: BOX(bx(f))
 
 # In the end, we end up with a box containing the actual value. So we just
 #   apply the identity function to get it out.
-# λn s z. n (BOX_APP s) (WRAP z) ID
-PRED    = lambda n: lambda s: lambda z: n(BOX_APP(s))(WRAP(z))(ID)
+# λn s z. n (APP s) (WRAP z) ID
+PRED    = lambda n: lambda s: lambda z: n(APP(s))(WRAP(z))(ID)
 
 # We can step through the first two applications.
-# BOX_APP s (WRAP z)  = BOX (WRAP z s)
-#                     = BOX z
+# APP s (WRAP z)  = BOX (WRAP z s)
+#                 = BOX z
 #
-# BOX_APP s (BOX z)   = BOX (BOX z s)
-#                     = BOX (s z)
+# APP s (BOX z)   = BOX (BOX z s)
+#                 = BOX (s z)
 
 # Let's test it out...
 def pred_tests():
@@ -260,7 +260,7 @@ EXP     = lambda m: lambda n: n(m)
 # Division is harder, so I'll leave that for later.
 
 def arith_tests():
-    s = lambda x: x+1
+    s = lambda x: x + 1
 
     print("add 3 4:", ADD(THREE)(FOUR)(s)(0))
     print("add 7 (add 6 5):", ADD(SEVEN)(ADD(SIX)(FIVE))(s)(0))
@@ -268,4 +268,74 @@ def arith_tests():
     print("mul 6 7:", MUL(SIX)(SEVEN)(s)(0))
     print("exp 3 4:", EXP(THREE)(FOUR)(s)(0))
     print("sub (exp 2 4) 3:", SUB(EXP(TWO)(FOUR))(THREE)(s)(0))
-arith_tests()
+
+    # And just as a reminder that the operations work regardless
+    #   of what the sucessor and zero actually are:
+    s1 = lambda x: x * 2
+    print("z1=1, s1=(x => x*2)")
+    print("add 3 4:", ADD(THREE)(FOUR)(s1)(1))
+    print("sub 7 2:", SUB(SEVEN)(TWO)(s1)(1))
+    print("mul 6 7:", MUL(SIX)(SEVEN)(s1)(1))
+    s2 = lambda x: x + '#'
+    print("z2='', s2=(x => x+'#')")
+    print("add 3 4:", ADD(THREE)(FOUR)(s2)(''))
+    print("sub 7 2:", SUB(SEVEN)(TWO)(s2)(''))
+    print("mul 6 2:", MUL(SIX)(TWO)(s2)(''))
+# arith_tests()
+
+"""
+PAIRS, LISTS, AND MAPS
+"""
+
+# A pair takes two values, and takes a function that selects either the
+#   first or the second argument.
+# λf s p. p f s
+PAIR    = lambda f: lambda s: lambda p: p(f)(s)
+# We need to select either the first or the second argument... that's exactly
+#   the definition of TRUE/FALSE!
+FST     = lambda p: p(TRUE)
+SND     = lambda p: p(FALSE)
+
+# Lists are just pairs, except the second value is a list.
+"""
+Inductive list :=
+| nil
+| cons (h : Any) (t : list).
+"""
+# λc n. n
+# λh t c n. c h (t c n)
+NIL     = lambda c: lambda n: n
+CONS    = lambda h: lambda t: lambda c: lambda n: c(h)(t(c)(n))
+
+# HEAD is just the first element of the pair. Note that the calling convention
+#   is a little weird - we need to give an second argument for nil,
+#   even though it's not used. It doesn't really matter what you put there.
+HEAD    = lambda l: FST(l)(NIL)
+# TAIL is a little more involved. We need to ignore the *last* application of
+#   cons, rather than the first, like we saw in PRED.
+TAIL    = lambda l: l # ...still trying to figure this one out.
+
+def list_tests():
+    # Get some stuff out of the way...
+    z = 0
+    s = lambda x: x + 1
+    nil = []
+    cons = lambda h: lambda t: [h] + t
+
+    pair12 = PAIR(ONE)(TWO)
+    
+    print("fst (1 2):", FST(pair12)(s)(z))
+    print("snd (1 2):", SND(pair12)(s)(z))
+    print("snd (fst ((1 2) 3)):", SND(FST(PAIR(PAIR(ONE)(TWO))(THREE)))(s)(z))
+
+    # Here's a function to transform a Church-encoded integer list into
+    #   a normal Python integer list.
+    tf = lambda l: list(map(lambda n: n(s)(z), l(cons)(nil)))
+    
+    list123 = CONS(ONE)(CONS(TWO)(CONS(THREE)(NIL)))
+
+    print("[1 2 3]:", tf(list123))
+    print("head [1 2 3]:", HEAD(list123)(s)(z))
+    print("tail [1 2 3]:", tf(TAIL(list123)))
+    print("head (tail (tail [1 2 3])):", HEAD(TAIL(TAIL(list123)))(s)(z))
+list_tests()
