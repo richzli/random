@@ -171,7 +171,7 @@ PRED    = lambda n: lambda s: lambda z: n(APP(s))(WRAP(z))(ID)
 # Let's test it out...
 def pred_tests():
     # Let's use a "real" successor function...
-    s = lambda x: x+1
+    s = lambda x: x + 1
 
     print("pred 3:", PRED(THREE)(s)(0))
     print("pred 7:", PRED(SEVEN)(s)(0))
@@ -293,7 +293,9 @@ PAIRS, LISTS, AND MAPS
 PAIR    = lambda f: lambda s: lambda p: p(f)(s)
 # We need to select either the first or the second argument... that's exactly
 #   the definition of TRUE/FALSE!
+# λp. p TRUE
 FST     = lambda p: p(TRUE)
+# λp. p FALSE
 SND     = lambda p: p(FALSE)
 
 # Lists are just pairs, except the second value is a list.
@@ -310,6 +312,8 @@ CONS    = lambda h: lambda t: lambda c: lambda n: c(h)(t(c)(n))
 # HEAD is just the first element of the pair. Note that the calling convention
 #   is a little weird - we need to give an second argument for nil,
 #   even though it's not used. It doesn't really matter what you put there.
+# λl. (fst l) NIL
+# λl. l TRUE NIL
 HEAD    = lambda l: FST(l)(NIL)
 # TAIL is a little more involved. We need to ignore the *last* application of
 #   cons, rather than the first, like we saw in PRED.
@@ -320,7 +324,7 @@ def list_tests():
     z = 0
     s = lambda x: x + 1
     nil = []
-    cons = lambda h: lambda t: [h] + t
+    cons = lambda h: lambda t: [h(s)(z)] + t # Let's just assume integers.
 
     pair12 = PAIR(ONE)(TWO)
     
@@ -328,14 +332,10 @@ def list_tests():
     print("snd (1 2):", SND(pair12)(s)(z))
     print("snd (fst ((1 2) 3)):", SND(FST(PAIR(PAIR(ONE)(TWO))(THREE)))(s)(z))
 
-    # Here's a function to transform a Church-encoded integer list into
-    #   a normal Python integer list.
-    tf = lambda l: list(map(lambda n: n(s)(z), l(cons)(nil)))
-    
     list123 = CONS(ONE)(CONS(TWO)(CONS(THREE)(NIL)))
 
-    print("[1 2 3]:", tf(list123))
+    print("[1 2 3]:", list123(cons)(nil))
     print("head [1 2 3]:", HEAD(list123)(s)(z))
-    print("tail [1 2 3]:", tf(TAIL(list123)))
+    print("tail [1 2 3]:", TAIL(list123)(cons)(nil))
     print("head (tail (tail [1 2 3])):", HEAD(TAIL(TAIL(list123)))(s)(z))
 list_tests()
