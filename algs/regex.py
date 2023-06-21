@@ -50,7 +50,8 @@ class RegExTokenizer:
             return Token(self.s[self.pos])
 
 class Node:
-    pass
+    def __repr__(self):
+        return f"{self.__class__.__name__}({', '.join(f'{v}' for _,v in vars(self).items())})"
 class Char(Node):
     __match_args__ = ("c",)
     def __init__(self, c: Token):
@@ -62,31 +63,17 @@ class Unary(Node):
     __match_args__ = ("a",)
     def __init__(self, a: Node):
         self.a = a
-    def __repr__(self):
-        return repr(self.a)
-class Star(Unary):
-    def __repr__(self):
-        return f"Star({super().__repr__()})"
-class Plus(Unary):
-    def __repr__(self):
-        return f"Plus({super().__repr__()})"
-class Option(Unary):
-    def __repr__(self):
-        return f"Option({super().__repr__()})"
+class Star(Unary): pass
+class Plus(Unary): pass
+class Option(Unary): pass
 
 class Binary(Node):
     __match_args__ = ("a", "b")
     def __init__(self, a: Node, b: Node):
         self.a = a
         self.b = b
-    def __repr__(self):
-        return f"{repr(self.a)}, {repr(self.b)}"
-class And(Binary):
-    def __repr__(self):
-        return f"And({super().__repr__()})"
-class Or(Binary):
-    def __repr__(self):
-        return f"Or({super().__repr__()})"
+class And(Binary): pass
+class Or(Binary): pass
 
 class Count(Node):
     __match_args__ = ("a", "m", "n")
@@ -94,8 +81,6 @@ class Count(Node):
         self.a = a
         self.m = m
         self.n = n
-    def __repr__(self):
-        return f"Count({repr(self.a)}, {self.m}, {self.n})"
 
 class Parser:
     def __init__(self, s: str):
@@ -115,7 +100,6 @@ class Parser:
         if self.stream.peek() is None:
             return
         if self.stream.peek() == expect:
-            self.stream.next()
             return
     
         l = self.parse_word(expect)
@@ -166,7 +150,7 @@ class Parser:
                 self.read("{")
                 m = self.parse_num()
                 n = m
-                if self.stream.peek == Token(","):
+                if self.stream.peek() == Token(","):
                     self.read(",")
                     n = self.parse_num()
                 self.read("}")
