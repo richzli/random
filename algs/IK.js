@@ -96,6 +96,6 @@ var aB$C$ = angle(B$, C$)
  *
  * `transform.rotation + rot_jX * 180 / Math.PI`
  */
-var rot_j1 = -aAB - angle([0, 0], z.fromWorldVec([1, 0])) + aA$B$
-var rot_j2 = -aBC - rot_j1 + aB$C$
+var rot_j1 = -aAB + angle(z.fromWorldVec([0, 0]), z.fromWorldVec([1, 0])) + aA$B$
+var rot_j2 = -aBC - rot_j1 + angle(z.fromWorldVec([0, 0]), z.fromWorldVec([1, 0])) + aB$C$
 var rot_j3 = -rot_j2 - rot_j1 // + your motion of choice
